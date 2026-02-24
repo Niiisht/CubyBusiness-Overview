@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CUBY — Business Landing</title>
+  <meta name="description" content="CUBY is an end-to-end industrial construction platform: Project → Manufacturing → Delivery → Construction, with quality and traceability." />
+  <style>
+    :root{
+      --bg:#060912;
+      --bg2:#070B18;
+      --text: rgba(255,255,255,.90);
+      --muted: rgba(255,255,255,.70);
+      --dim: rgba(255,255,255,.52);
+      --line: rgba(255,255,255,.14);
+      --card: rgba(255,255,255,.06);
+      --card2: rgba(255,255,255,.10);
+      --accentA:#7c3aed;
+      --accentB:#06b6d4;
+      --accentC:#22c55e;
+      --warn:#fbbf24;
+      --bad:#ef4444;
+      --shadow: 0 28px 90px rgba(0,0,0,.50);
+      --r: 22px;
+      --r2: 16px;
+      --maxw: 1240px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;padding:0;color:var(--text);font-family:var(--sans);scroll-behavior:smooth;
+      background:
+        radial-gradient(1200px 700px at 15% 12%, rgba(124,58,237,.30), transparent 60%),
+        radial-gradient(900px 600px at 70% 16%, rgba(6,182,212,.22), transparent 62%),
+        radial-gradient(900px 650px at 52% 90%, rgba(34,197,94,.12), transparent 58%),
+        linear-gradient(180deg,var(--bg),var(--bg2));
+      overflow-x:hidden;
+    }
+    a{color:inherit;text-decoration:none}
+    .container{width:100%;max-width:var(--maxw);margin:0 auto;padding:0 22px;}
+
+    /* Presentation feel */
+    .deck{scroll-snap-type:y mandatory;}
+    .slide{
+      min-height: 100vh;
+      scroll-snap-align:start;
+      scroll-snap-stop: always;
+      display:flex;
+      align-items:center;
+      padding: 72px 0;
+      position:relative;
+    }
+    @media (max-width: 720px){
+      .slide{padding: 92px 0 64px; align-items:flex-start;}
+    }
+
+    /* Top bar */
+    .topbar{
+      position:fixed; inset:0 0 auto 0;
+      z-index:50;
+      backdrop-filter: blur(14px);
+      background: rgba(6,9,18,.55);
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+    .topbar .inner{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;}
+    .brand{display:flex;align-items:center;gap:10px;}
+    .logo{
+      width:38px;height:38px;border-radius:12px;
+      background: linear-gradient(135deg, rgba(124,58,237,.95), rgba(6,182,212,.85));
+      box-shadow: 0 18px 50px rgba(124,58,237,.22);
+      position:relative;overflow:hidden;
+    }
+    .logo:before{
+      content:"";position:absolute;inset:-40%;
+      background: conic-gradient(from 120deg, rgba(255,255,255,0), rgba(255,255,255,.25), rgba(255,255,255,0));
+      animation: spin 7s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .brand .t{display:flex;flex-direction:column;line-height:1.05}
+    .brand .t b{letter-spacing:.28em;font-size:12px;text-transform:uppercase}
+    .brand .t span{font-size:12px;color:var(--muted)}
+
+    .nav{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .chip{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      padding:8px 10px;border-radius:999px;
+      font-size:12px;color:var(--muted);
+      transition: transform .2s ease, background .2s ease, border-color .2s ease;
+      cursor:pointer;
+    }
+    .chip:hover{transform: translateY(-1px);background: rgba(255,255,255,.07);border-color: rgba(255,255,255,.22)}
+    .chip.primary{
+      color: rgba(255,255,255,.92);
+      background: linear-gradient(135deg, rgba(124,58,237,.22), rgba(6,182,212,.16));
+      border-color: rgba(124,58,237,.38);
+    }
+
+    /* Side progress */
+    .rail{
+      position:fixed; right:16px; top:50%; transform: translateY(-50%);
+      z-index:40; display:flex; flex-direction:column; gap:10px;
+      padding:10px 8px; border-radius: 999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+      backdrop-filter: blur(10px);
+    }
+    .dot{
+      width:10px;height:10px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.22);
+      background: rgba(255,255,255,.10);
+      cursor:pointer;
+      transition: transform .18s ease, background .18s ease, border-color .18s ease;
+    }
+    .dot:hover{transform:scale(1.15)}
+    .dot.active{
+      background: linear-gradient(135deg, rgba(124,58,237,.92), rgba(6,182,212,.70));
+      border-color: rgba(255,255,255,.22);
+      box-shadow: 0 0 0 6px rgba(124,58,237,.16);
+    }
+    @media(max-width: 980px){ .rail{display:none;} }
+
+    /* Type */
+    h1{margin:0; font-size:56px; line-height:1.02; letter-spacing:-.02em}
+    @media(max-width: 720px){h1{font-size:40px}}
+    h2{margin:0; font-size:28px; letter-spacing:-.01em}
+    .sub{margin-top:14px; color:var(--muted); font-size:16px; line-height:1.65; max-width:78ch}
+    .eyebrow{
+      display:inline-flex; gap:10px; align-items:center; flex-wrap:wrap;
+      font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+    }
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+    }
+    .pulse{
+      width:7px;height:7px;border-radius:999px;background: var(--accentB);
+      box-shadow:0 0 0 6px rgba(6,182,212,.14);
+      animation: pulse 2.2s ease-in-out infinite;
+    }
+    @keyframes pulse{
+      0%,100%{transform:scale(1); box-shadow:0 0 0 6px rgba(6,182,212,.12)}
+      50%{transform:scale(1.08); box-shadow:0 0 0 10px rgba(6,182,212,.06)}
+    }
+
+    /* Buttons */
+    .row{display:flex; gap:12px; flex-wrap:wrap; margin-top:18px}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      padding:12px 14px; border-radius: 14px;
+      font-weight:650; font-size:14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      transition: transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+      cursor:pointer;
+    }
+    .btn:hover{transform: translateY(-1px); background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.22)}
+    .btn.primary{
+      border-color: rgba(124,58,237,.45);
+      background: linear-gradient(135deg, rgba(124,58,237,.36), rgba(6,182,212,.22));
+      box-shadow: 0 18px 60px rgba(124,58,237,.18);
+    }
+    .btn.primary:hover{box-shadow: 0 22px 74px rgba(124,58,237,.22)}
+    .btn.ghost{background: rgba(255,255,255,.02)}
+    .btn.disabled{opacity:.55; cursor:not-allowed; transform:none !important;}
+
+    /* Layout blocks */
+    .grid{
+      display:grid; grid-template-columns: 1.1fr .9fr; gap:26px; align-items:center;
+      width:100%;
+    }
+    @media(max-width: 980px){ .grid{grid-template-columns:1fr; gap:18px;} }
+    .card{
+      border-radius: var(--r);
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      box-shadow: var(--shadow);
+      padding:18px;
+      position:relative; overflow:hidden;
+    }
+    .card:before{
+      content:""; position:absolute; inset:-18%;
+      background:
+        radial-gradient(closest-side at 20% 20%, rgba(124,58,237,.22), transparent 68%),
+        radial-gradient(closest-side at 78% 26%, rgba(6,182,212,.18), transparent 68%),
+        radial-gradient(closest-side at 60% 92%, rgba(34,197,94,.10), transparent 70%);
+      filter: blur(12px);
+      opacity:.85;
+      pointer-events:none;
+    }
+    .card > *{position:relative; z-index:1}
+
+    /* Flow */
+    .flow{display:grid; gap:10px;}
+    .fitem{
+      display:flex; gap:12px; align-items:flex-start;
+      padding:12px; border-radius: 16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+    .fitem:hover{transform: translateY(-1px); background: rgba(0,0,0,.26); border-color: rgba(255,255,255,.16)}
+    .pill{
+      font-family: var(--mono);
+      font-size:12px; padding:6px 9px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.82);
+      white-space:nowrap;
+    }
+    .fitem b{display:block; font-size:13px}
+    .fitem p{margin:6px 0 0; color:var(--muted); font-size:12.5px; line-height:1.55}
+
+    /* Modules grid */
+    .modsWrap{position:relative;}
+    .mods{
+      position:relative;
+      display:grid; grid-template-columns: repeat(3, 1fr); gap:14px; width:100%;
+      z-index:2;
+    }
+    @media(max-width: 980px){.mods{grid-template-columns: repeat(2,1fr)}}
+    @media(max-width: 640px){.mods{grid-template-columns:1fr}}
+    .mod{
+      padding:16px; border-radius: var(--r);
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      box-shadow: 0 18px 60px rgba(0,0,0,.18);
+      transform: translateY(10px);
+      opacity:0;
+    }
+    .mod.reveal{transform: translateY(0); opacity:1; transition: transform .6s cubic-bezier(.2,.8,.2,1), opacity .6s ease;}
+    .mod .top{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px}
+    .mod .name{font-size:18px; margin:0}
+
+    /* Status badges: micro hover animation */
+    .status{
+      font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+      padding:6px 8px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color: rgba(255,255,255,.78);
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, filter .18s ease;
+      transform-origin: right center;
+      user-select:none;
+    }
+    .status:hover{
+      transform: translateY(-1px) scale(1.04);
+      box-shadow: 0 0 0 6px rgba(255,255,255,.06);
+      border-color: rgba(255,255,255,.22);
+      filter: brightness(1.06);
+    }
+    .status.live{border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.10)}
+    .status.dev{border-color: rgba(251,191,36,.35); background: rgba(251,191,36,.12)}
+    .status.mobile{border-color: rgba(6,182,212,.35); background: rgba(6,182,212,.10)}
+    .mod p{margin:0; color:var(--muted); line-height:1.6; font-size:13px}
+    .bul{margin:10px 0 0; padding:0 0 0 16px; color:var(--muted); line-height:1.55; font-size:13px}
+    .bul li{margin:6px 0}
+    .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:auto; padding-top:12px}
+    .mod{display:flex; flex-direction:column}
+    .btn.sm.video{
+      border-color: rgba(124,58,237,.45);
+      background: linear-gradient(135deg, rgba(124,58,237,.36), rgba(6,182,212,.22));
+      box-shadow: 0 18px 60px rgba(124,58,237,.18);
+      color:rgba(255,255,255,.95);
+    }
+    .btn.sm.video:hover{box-shadow: 0 22px 74px rgba(124,58,237,.22)}
+    .btn.sm{padding:10px 12px; border-radius: 13px; font-size:13px}
+
+    .pathLine{
+      fill:none;
+      stroke: rgba(255,255,255,.20);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 14 10;
+      animation: dash 10s linear infinite;
+    }
+    .pathGlow{
+      fill:none;
+      stroke: rgba(124,58,237,.22);
+      stroke-width: 6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity:.65;
+      filter: blur(0.2px);
+      stroke-dasharray: 40 20;
+      animation: dash2 8s linear infinite;
+    }
+    .pathArrow{
+      fill: rgba(255,255,255,.30);
+    }
+    @keyframes dash{to{stroke-dashoffset:-240}}
+    @keyframes dash2{to{stroke-dashoffset:-320}}
+
+    /* “Presentation” cards */
+    .bigNum{
+      font-size: 54px; font-weight: 800; letter-spacing:-.02em;
+      background: linear-gradient(135deg, rgba(124,58,237,.95), rgba(6,182,212,.85));
+      -webkit-background-clip: text; background-clip:text; color: transparent;
+      line-height: 1;
+    }
+    .fact{
+      display:grid; grid-template-columns: 120px 1fr; gap:12px;
+      padding:14px; border-radius: 18px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+    }
+    .fact p{margin:0; color:var(--muted); line-height:1.6}
+
+    /* Modal */
+    .modal{
+      position:fixed; inset:0; z-index:200;
+      background: rgba(0,0,0,.62);
+      display:none; align-items:center; justify-content:center;
+      padding:20px;
+    }
+    .modal.open{display:flex}
+    .modal .box{
+      width:min(980px, 96vw);
+      border-radius: 18px;
+      background: rgba(10,14,28,.88);
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow: 0 30px 120px rgba(0,0,0,.55);
+      overflow:hidden;
+    }
+    .modal .head{display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.10);}
+    .modal .head b{font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:rgba(255,255,255,.82)}
+    .modal .close{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      color:rgba(255,255,255,.85);
+      border-radius: 12px;
+      padding:8px 10px;
+      cursor:pointer;
+    }
+    .embed{
+      width:100%;
+      aspect-ratio: 16/9;
+      background: rgba(0,0,0,.35);
+      display:flex; align-items:center; justify-content:center;
+      color:var(--muted);
+      overflow:hidden;
+    }
+    .embed iframe{width:100%; height:100%; border:0}
+    .hint{font-size:12px;color:var(--dim); margin-top:10px}
+    .kbd :focus{outline: 2px solid rgba(6,182,212,.65); outline-offset: 2px}
+    :focus{outline:none}
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      *{animation:none !important; transition:none !important; scroll-behavior:auto !important;}
+      .deck{scroll-snap-type:none;}
+      .pathLayer{display:none !important;}
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="container">
+      <div class="inner">
+        <a class="brand" href="#s1">
+          <div class="logo" aria-hidden="true"></div>
+          <div class="t">
+            <b>CUBY</b>
+            <span>Business Overview</span>
+          </div>
+        </a>
+        <div class="nav" aria-label="Top navigation">
+          <a class="chip" href="#s2">Value</a>
+          <a class="chip" href="#s3">How it works</a>
+          <a class="chip" href="#s4">Modules</a>
+          <a class="chip primary" href="#s6">Thank you</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rail" aria-label="Slide navigation">
+    <div class="dot" data-go="#s1" title="Hero"></div>
+    <div class="dot" data-go="#s2" title="Value"></div>
+    <div class="dot" data-go="#s3" title="Flow"></div>
+    <div class="dot" data-go="#s4" title="Modules"></div>
+    <div class="dot" data-go="#s5" title="Why"></div>
+    <div class="dot" data-go="#s6" title="CTA"></div>
+  </div>
+
+  <main class="deck" id="deck">
+    <!-- Slide 1 -->
+    <section class="slide" id="s1" data-slide>
+      <div class="container">
+        <div class="grid">
+          <div>
+            <div class="eyebrow">
+              <span class="badge"><span class="pulse"></span>End‑to‑End Industrial Construction</span>
+              <span class="badge">Project → Manufacturing → Delivery → Construction</span>
+              <span class="badge">Quality + Traceability</span>
+            </div>
+            <h1>Construction as a managed product</h1>
+            <div class="sub">
+              <b>CUBY</b> connects project execution, manufacturing, delivery, and on‑site construction into one business‑friendly flow.
+              You get a single view of <b>timeline</b>, <b>progress</b>, and <b>quality</b> — without diving into engineering details.
+            </div>
+            <div class="row">
+              <a class="btn" href="#s4">See modules →</a>
+              <a class="btn ghost" href="#s3">Flow diagram</a>
+            </div>
+            <div class="hint">Presentation mode: scroll‑snap “slides” + keyboard navigation (←/→ and Space).</div>
+          </div>
+
+          <div class="card">
+            <h2 style="margin:0 0 10px">One flow. One status.</h2>
+            <div class="flow">
+              <div class="fitem">
+                <div class="pill">CUBY Project</div>
+                <div>
+                  <b>Plan + team + control</b>
+                  <p>Creates the plan and orchestrates manufacturing, delivery, and site execution.</p>
+                </div>
+              </div>
+              <div class="fitem">
+                <div class="pill">CUBY Manufacturing</div>
+                <div>
+                  <b>Build components</b>
+                  <p>Produces assemblies “just‑in‑time”, confirms readiness and quality.</p>
+                </div>
+              </div>
+              <div class="fitem">
+                <div class="pill">CUBY Delivery</div>
+                <div>
+                  <b>Pack + ship + receive</b>
+                  <p>Packaging, shipment tracking, and delivery confirmation on site.</p>
+                </div>
+              </div>
+              <div class="fitem">
+                <div class="pill">CUBY Construction</div>
+                <div>
+                  <b>Install + accept</b>
+                  <p>Shifts, checklists, and proof that work meets requirements.</p>
+                </div>
+              </div>
+            </div>
+<!--            <div class="hint">Video buttons open a modal. Web modules link to your live URLs.</div>-->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 2 -->
+    <section class="slide" id="s2" data-slide>
+      <div class="container">
+        <div class="grid">
+          <div>
+            <h2>What CUBY delivers to the business</h2>
+            <div class="sub">
+              Move from “manual construction” to a repeatable operating model — with standards, statuses, and quality checkpoints at every stage.
+            </div>
+            <div class="row">
+              <a class="btn" href="#s3">Next: flow →</a>
+            </div>
+            <div style="display:grid; gap:12px; margin-top:16px">
+              <div class="fact">
+                <div class="bigNum">1</div>
+                <div><p><b>Predictable timelines</b> — one progress view from plan to install. Fewer surprises.</p></div>
+              </div>
+              <div class="fact">
+                <div class="bigNum">2</div>
+                <div><p><b>Measurable quality</b> — checklists + confirmations: who checked what and when.</p></div>
+              </div>
+              <div class="fact">
+                <div class="bigNum">3</div>
+                <div><p><b>Less waste</b> — JIT production + controlled delivery, fewer reworks and excess inventory.</p></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2 style="margin:0 0 10px">Executive signals</h2>
+            <div class="flow">
+              <div class="fitem">
+                <div class="pill">Timeline</div>
+                <div><b>On‑time delivery</b><p>You immediately see where the delay sits: factory, logistics, or site.</p></div>
+              </div>
+              <div class="fitem">
+                <div class="pill">Quality</div>
+                <div><b>Pass / fail checkpoints</b><p>Approvals and evidence reduce disputes and rework.</p></div>
+              </div>
+              <div class="fitem">
+                <div class="pill">Ownership</div>
+                <div><b>Clear responsibility</b><p>Who owns the next action — visible by stage and team.</p></div>
+              </div>
+            </div>
+<!--            <div class="hint">If you want, I can add a dedicated “Investor Dashboard” slide with 3–5 KPIs.</div>-->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 3 -->
+    <section class="slide" id="s3" data-slide>
+      <div class="container">
+        <div class="grid">
+          <div>
+            <h2>How it works</h2>
+            <div class="sub">
+              The chain is always the same: <b>Plan → Build → Deliver → Install</b>.
+              Office teams use web modules; field teams use mobile apps.
+            </div>
+            <div class="row">
+              <a class="btn" href="#s4">Go to modules →</a>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2 style="margin:0 0 10px">End‑to‑end scenario</h2>
+            <div class="flow">
+              <div class="fitem"><div class="pill">1 • Home</div><div><b>Start / pre‑sales</b><p>Draw your dream house in a graphic editor  and initiate the workflow.</p></div></div>
+              <div class="fitem"><div class="pill">2 • Project</div><div><b>Plan & coordinate</b><p>Schedule, team, dependencies, and progress tracking.</p></div></div>
+              <div class="fitem"><div class="pill">3 • Manufacturing</div><div><b>Produce assemblies</b><p>Confirm readiness & quality before shipping.</p></div></div>
+              <div class="fitem"><div class="pill">4 • Delivery</div><div><b>Pack & logistics</b><p>Ship, track, and confirm receipt on site.</p></div></div>
+              <div class="fitem"><div class="pill">5 • Construction</div><div><b>Install & accept</b><p>Shifts, checklists, and sign‑offs.</p></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 4: Modules -->
+    <section class="slide" id="s4" data-slide>
+      <div class="container">
+        <div style="width:100%">
+          <h2>Modules</h2>
+<!--          <div class="sub">-->
+<!--            Each module is a “station” in the flow. Every module has <b>Go to module</b> and <b>Watch video</b> (mobile apps: video only).-->
+<!--          </div>-->
+          <div class="row">
+            <a class="btn" href="#s5">Why it scales →</a>
+          </div>
+
+          <div class="modsWrap" style="margin-top:16px">
+            <h3 style="margin:0 0 4px; font-size:15px; letter-spacing:.10em; text-transform:uppercase; color:rgba(255,255,255,.45);">🌐 Web Modules</h3>
+            <!-- animated path (desktop only) -->
+            <div class="mods">
+              <!-- Row 1 -->
+              <div class="mod" data-reveal>
+                <div class="top"><h3 class="name">CUBY Platform</h3><span class="status live">Live</span></div>
+                <p>Company admin hub: org setup, users, licenses, payments, and workspace access.</p>
+                <ul class="bul">
+                  <li>Create & manage companies</li>
+                  <li>Add users and assign access</li>
+                  <li>Create/assign licenses, view payments</li>
+                  <li>Owner workspace switching (Project / Manufacturing)</li>
+                  <li>Unified entry point for the ecosystem</li>
+                </ul>
+                <div class="actions">
+                  <a class="btn sm" href="http://13.61.235.199/cuby-platform/admin/companies/edit/6999ad3df78bcbb7500272c2" target="_blank" rel="noreferrer">Go to module →</a>
+                  <button class="btn sm video" data-open-video="platform">▶︎ Watch video</button>
+                </div>
+              </div>
+
+              <div class="mod" data-reveal>
+                <div class="top"><h3 class="name">CUBY Factory</h3><span class="status live">Live</span></div>
+                <p>Visual “standards studio”: define manufacturing technologies, processes, and work instructions.</p>
+                <ul class="bul">
+                  <li>Build process structures (stages & steps)</li>
+                  <li>Attach instructions, checklists, and standards</li>
+                  <li>Reuse templates across products/projects</li>
+                  <li>Version standards for controlled change</li>
+                  <li>Make execution repeatable and auditable</li>
+                </ul>
+                <div class="actions">
+                  <a class="btn sm" href="http://13.61.235.199/cuby-factory/super-admin/dashboard/technology/6999a5330aa6879cd6f2bf78" target="_blank" rel="noreferrer">Go to module →</a>
+                  <button class="btn sm video" data-open-video="factory">▶︎ Watch video</button>
+                </div>
+              </div>
+
+              <div class="mod" data-reveal>
+                <div class="top"><h3 class="name">CUBY Construction</h3><span class="status live">Live</span></div>
+                <p>Full construction technology model: define how a house is built, break work into controllable units, and manage execution.</p>
+                <ul class="bul">
+                  <li>Create construction technologies with stages</li>
+                  <li>Tasks split into work tasks and inspection tasks</li>
+                  <li>Work tasks divided into quants (min work units: operations, criteria, instructions)</li>
+                  <li>Shift start & shift end tasks for structured workdays</li>
+                  <li>Role distribution: assign teams and responsibilities</li>
+                </ul>
+                <div class="actions">
+                  <a class="btn sm" href="http://13.61.235.199/cuby-construction/admin/technologies/6999a73abd50e21e8f36995a" target="_blank" rel="noreferrer">Go to module →</a>
+                  <button class="btn sm video" data-open-video="construction">▶︎ Watch video</button>
+                </div>
+              </div>
+
+              <!-- Row 2 -->
+              <div class="mod" data-reveal>
+                <div class="top"><h3 class="name">CUBY Project</h3><span class="status live">Live</span></div>
+                <p>Construction project control center: schedule, team, progress, and coordination across modules.</p>
+                <ul class="bul">
+                  <li>Project phases & milestones</li>
+                  <li>Assign teams/owners and track responsibilities</li>
+                  <li>Dependencies between site work and components</li>
+                  <li>Progress tracking and status reporting</li>
+                  <li>Create demand for Manufacturing & Delivery</li>
+                </ul>
+                <div class="actions">
+<!--                  <a class="btn sm" href="http://13.61.235.199/cuby-project/" target="_blank" rel="noreferrer">Go to module →</a>-->
+                  <button class="btn sm video" data-open-video="project">▶︎ Watch video</button>
+                </div>
+              </div>
+
+              <div class="mod" data-reveal>
+                <div class="top"><h3 class="name">CUBY Home Constructor</h3><span class="status live">Live</span></div>
+                <p>Visual home designer: draw your dream house in a graphic editor and launch it into production.</p>
+                <ul class="bul">
+                  <li>Home configuration</li>
+                  <li>Save & compare variants</li>
+                  <li>Generate a "starter" package for Project</li>
+                  <li>Fast path from idea → execution</li>
+                </ul>
+                <div class="actions">
+                  <a class="btn sm" href="http://13.61.235.199/cuby-home-constructor/" target="_blank" rel="noreferrer">Go to module →</a>
+                  <button class="btn sm video" data-open-video="home">▶︎ Watch video</button>
+                </div>
+              </div>
+
+              <div class="mod" data-reveal>
+                <div class="top"><h3 class="name">CUBY Manufacturing</h3><span class="status live">Live</span></div>
+                <p>Shopfloor production management: orders, readiness, and quality confirmation.</p>
+                <ul class="bul">
+                  <li>Manufacturing orders & work tracking</li>
+                  <li>Real‑time readiness status for assemblies</li>
+                  <li>Quality checkpoints and sign‑offs</li>
+                  <li>Prepare items for packaging/shipping</li>
+                  <li>Sync progress back to Project</li>
+                </ul>
+                <div class="actions">
+                  <a class="btn sm" href="https://www.figma.com/make/8FCGywzC0Zu8naqhQ4h8rS/Manufacturing-v1?fullscreen=1&t=tuNb0Vb6LZh64rSS-1" target="_blank" rel="noreferrer">View Design →</a>
+                  <button class="btn sm video" data-open-video="manufacturing">▶︎ Watch video</button>
+                </div>
+              </div>
+
+              <div class="mod" data-reveal>
+                <div class="top"><h3 class="name">CUBY Delivery</h3><span class="status live">Live</span></div>
+                <p>Logistics layer: packing, shipment tracking, and delivery confirmation on site.</p>
+                <ul class="bul">
+                  <li>Pick/pack and labeling workflow</li>
+                  <li>Shipment creation and tracking statuses</li>
+                  <li>Proof of delivery and exception handling</li>
+                  <li>Site receipt confirmations (scan + photos)</li>
+                  <li>Close the loop back to Project</li>
+                </ul>
+                <div class="actions">
+                  <a class="btn sm" href="https://www.figma.com/make/RG6IAk7sqNCwo8Xa8Enx1H/Create-Interactive-Prototype?fullscreen=1&t=mmaDUUz6186ci1R9-1" target="_blank" rel="noreferrer">View Design →</a>
+                  <button class="btn sm video" data-open-video="delivery">▶︎ Watch video</button>
+                </div>
+              </div>
+
+              <div class="mod" data-reveal>
+                <div class="top"><h3 class="name">CUBY AI Instruction</h3><span class="status live">Live</span></div>
+                <p>Intelligent assistance: natural language queries for technical documentation and standards.</p>
+                <ul class="bul">
+                  <li>Voice-activated technical support</li>
+                  <li>Smart search across standards</li>
+                  <li>Automated anomaly detection</li>
+                  <li>Predictive quality guidance</li>
+                </ul>
+                <div class="actions">
+                  <button class="btn sm video" data-open-video="ai">▶︎ Watch video</button>
+                </div>
+              </div>
+
+            </div>
+
+            <h3 style="margin:32px 0 4px; font-size:15px; letter-spacing:.10em; text-transform:uppercase; color:rgba(255,255,255,.45); border-top:1px solid rgba(255,255,255,.08); padding-top:28px;">📱 Mobile Apps</h3>
+            <div class="mods">
+              <div class="mod" data-reveal>
+                <div class="top"><h3 class="name">CUBY Project App</h3><span class="status mobile">Mobile</span></div>
+                <p>Field app for crews: shift → tasks → quality confirmation (video only on this landing).</p>
+                <ul class="bul">
+                  <li>Join/start shifts</li>
+                  <li>Execute assigned tasks</li>
+                  <li>Capture proof (photos/notes)</li>
+                  <li>Confirm quality checkpoints</li>
+                </ul>
+                <div class="actions">
+                  <button class="btn sm video" data-open-video="projectapp">▶︎ Watch video</button>
+                </div>
+              </div>
+
+              <div class="mod" data-reveal>
+                <div class="top"><h3 class="name">CUBY Manufacturing App</h3><span class="status mobile">Mobile</span></div>
+                <p>Mobile shopfloor app: daily work, instructions, checklists, proof.</p>
+                <ul class="bul">
+                  <li>Today’s work queue</li>
+                  <li>Work instructions & checklists</li>
+                  <li>Photo/signature capture</li>
+                  <li>Quality confirmations</li>
+                </ul>
+                <div class="actions">
+                  <a class="btn sm" href="https://www.figma.com/proto/gveDOV1MXiS9rjR1LXNseP/%E2%9D%96-CUBY-App?page-id=17975%3A134848&node-id=18017-6158&viewport=7052%2C1505%2C0.14&t=a8Nwla8yOwx9oUmF-1&scaling=min-zoom&content-scaling=fixed&starting-point-node-id=18017%3A6158&show-proto-sidebar=1" target="_blank" rel="noreferrer">View Design →</a>
+                  <button class="btn sm video" data-open-video="mfgapp">▶︎ Watch video</button>
+                </div>
+              </div>
+
+              <div class="mod" data-reveal>
+                <div class="top"><h3 class="name">CUBY Delivery App</h3><span class="status mobile">Mobile</span></div>
+                <p>Mobile logistics app: scan labels, confirm receipt, capture exceptions.</p>
+                <ul class="bul">
+                  <li>Scan QR/barcodes</li>
+                  <li>Confirm shipment/receipt</li>
+                  <li>Photo evidence and notes</li>
+                  <li>Handle missing/damaged items</li>
+                </ul>
+                <div class="actions">
+                  <a class="btn sm" href="https://www.figma.com/proto/gveDOV1MXiS9rjR1LXNseP/%E2%9D%96-CUBY-App?page-id=425%3A36122&node-id=425-59922&viewport=804%2C769%2C0.11&t=mm6DmSQeOKff1eoR-1&scaling=min-zoom&content-scaling=fixed&starting-point-node-id=425%3A59922" target="_blank" rel="noreferrer">View Design →</a>
+                </div>
+              </div>
+
+              <div class="mod" data-reveal>
+                <div class="top"><h3 class="name">CUBY AR</h3><span class="status mobile">Mobile</span></div>
+                <p>Augmented reality for on-site guidance: overlay digital models onto physical components.</p>
+                <ul class="bul">
+                  <li>Real-time assembly overlays</li>
+                  <li>Visual alignment guides</li>
+                  <li>Step-by-step 3D instructions</li>
+                  <li>Identify components via AR tags</li>
+                </ul>
+                <div class="actions">
+                  <button class="btn sm video" data-open-video="ar">▶︎ Watch video</button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 5 -->
+    <section class="slide" id="s5" data-slide>
+      <div class="container">
+        <div class="grid">
+          <div>
+            <h2>Why this scales</h2>
+            <div class="sub">
+              CUBY makes operations repeatable: standards in <b>Factory</b>, execution in <b>Project</b>, output in <b>Manufacturing</b>,
+              logistics in <b>Delivery</b>, and installation in <b>Construction</b>.
+            </div>
+            <div class="row">
+              <a class="btn" href="#s6">Go to CTA →</a>
+            </div>
+            <div style="display:grid; gap:12px; margin-top:16px">
+              <div class="fact"><div class="bigNum">A</div><div><p><b>Standardization</b> — one way to do work, one way to validate it.</p></div></div>
+              <div class="fact"><div class="bigNum">B</div><div><p><b>Traceability</b> — every assembly, shipment, and task has a status and confirmation.</p></div></div>
+              <div class="fact"><div class="bigNum">C</div><div><p><b>Control</b> — bottlenecks become visible early: factory, logistics, or site.</p></div></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2 style="margin:0 0 10px">What leadership sees</h2>
+            <div class="flow">
+              <div class="fitem"><div class="pill">Progress</div><div><b>Unified progress</b><p>One set of statuses across the chain.</p></div></div>
+              <div class="fitem"><div class="pill">Quality</div><div><b>Evidence-based quality</b><p>Checklists + proof reduce rework and disputes.</p></div></div>
+              <div class="fitem"><div class="pill">Risk</div><div><b>Earlier risk detection</b><p>Issues surface where they happen, not at the end.</p></div></div>
+            </div>
+<!--            <div class="hint">Want a separate “Investor Dashboard” slide? Send 3–5 target KPIs and I’ll add it.</div>-->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 6 -->
+    <section class="slide" id="s6" data-slide>
+      <div class="container">
+        <div class="grid">
+          <div>
+            <h2>Thank you for your attention</h2>
+            <div class="sub">
+              We appreciate your time exploring the CUBY ecosystem. Feel free to revisit any module above.
+            </div>
+            <div class="row">
+              <a class="btn ghost" href="#s1">Back to top</a>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2 style="margin:0 0 10px">Presentation controls</h2>
+            <div class="flow">
+              <div class="fitem"><div class="pill">Space / →</div><div><b>Next slide</b><p>Auto-scroll like a deck.</p></div></div>
+              <div class="fitem"><div class="pill">←</div><div><b>Previous slide</b><p>Go back one slide.</p></div></div>
+              <div class="fitem"><div class="pill">Esc</div><div><b>Close video</b><p>Closes the video modal.</p></div></div>
+            </div>
+            <div class="hint">© <span id="year"></span> CUBY </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Video modal -->
+  <div class="modal" id="modal">
+    <div class="box" role="dialog" aria-modal="true" aria-label="Video">
+      <div class="head">
+        <b id="modalTitle">Video</b>
+        <button class="close" id="modalClose">✕ Close</button>
+      </div>
+      <div class="embed" id="embed"></div>
+    </div>
+  </div>
+
+  <script>
+    // ========================== CONFIG ==========================
+    // Replace URLs with your real demo videos (YouTube/Vimeo/any iframe).
+    const CONFIG = {
+      videos: {
+        overview:     { title: "CUBY — Overview (2 min)", url: "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0" },
+        full:         { title: "CUBY — Full Demo (10 min)", url: "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0" },
+        value:        { title: "CUBY — Business Value", url: "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0" },
+        modules:      { title: "CUBY — Modules Tour", url: "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0" },
+        why:          { title: "CUBY — Why it Scales", url: "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0" },
+
+        platform:     { title: "CUBY Platform", url: "video/Platform.mov" },
+        factory:      { title: "CUBY Factory", url: "video/Factory.mov" },
+        home:         { title: "CUBY Home Constructor", url: "video/Запись экрана 2026-02-21 в 18.04.58.mp4" },
+        project:      { title: "CUBY Project", url: "video/Project.mov" },
+        projectapp:   { title: "CUBY Project App (Mobile)", url: "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0" },
+        manufacturing:{ title: "CUBY Manufacturing", url: "video/Manufacture.mov" },
+        mfgapp:       { title: "CUBY Manufacturing App", url: "video/ManufacturingApp.mov" },
+        delivery:     { title: "CUBY Delivery", url: "video/Delivery.mov" },
+        deliveryapp:  { title: "CUBY Delivery App", url: "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0" },
+        ar:           { title: "CUBY AR", url: "video/ar.mp4" },
+        ai:           { title: "CUBY AI Instruction", url: "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0" },
+        construction: { title: "CUBY Construction", url: "video/Consctruction.mov" }
+      }
+    };
+    // ===========================================================
+
+    // Focus outline only for keyboard
+    (function(){
+      window.addEventListener('keydown', (e)=>{ if(e.key === 'Tab'){ document.body.classList.add('kbd'); }});
+      window.addEventListener('mousedown', ()=>{ document.body.classList.remove('kbd'); });
+    })();
+
+    // Reveal cards
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){
+          e.target.classList.add('reveal');
+          io.unobserve(e.target);
+        }
+      })
+    }, {threshold: 0.14});
+    document.querySelectorAll('[data-reveal]').forEach(el=>io.observe(el));
+
+    // Video modal
+    const modal = document.getElementById('modal');
+    const embed = document.getElementById('embed');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalClose = document.getElementById('modalClose');
+
+    function openVideo(key){
+      const v = CONFIG.videos[key] || CONFIG.videos.overview;
+      modalTitle.textContent = v.title || "Video";
+      if(v.url.endsWith('.mp4') || v.url.endsWith('.mov')){
+        embed.innerHTML = `<video src="${v.url}" controls autoplay style="width:100%; height:100%; border:none; border-radius:12px;"></video>`;
+      } else {
+        embed.innerHTML = `<iframe src="${v.url}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+      }
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeVideo(){
+      modal.classList.remove('open');
+      embed.innerHTML = '';
+      document.body.style.overflow = '';
+    }
+    document.querySelectorAll('[data-open-video]').forEach(btn=>{
+      btn.addEventListener('click', ()=> openVideo(btn.getAttribute('data-open-video')));
+    });
+    modalClose.addEventListener('click', closeVideo);
+    modal.addEventListener('click', (e)=>{ if(e.target === modal) closeVideo(); });
+
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Slide progress + “presentation” keyboard navigation
+    const slides = Array.from(document.querySelectorAll('[data-slide]'));
+    const slideIds = slides.map(s => '#'+s.id);
+
+    const dots = Array.from(document.querySelectorAll('.rail .dot'));
+    dots.forEach((d,i)=>d.addEventListener('click', ()=>slides[i].scrollIntoView({behavior:'smooth'})));
+
+    const so = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){
+          const id = '#'+e.target.id;
+          const idx = slideIds.indexOf(id);
+          dots.forEach(x=>x.classList.remove('active'));
+          if(idx >= 0) dots[idx].classList.add('active');
+        }
+      })
+    }, {threshold: 0.1});
+    slides.forEach(s=>so.observe(s));
+
+    function getActiveIndex(){
+      const activeDot = dots.findIndex(d => d.classList.contains('active'));
+      return activeDot >= 0 ? activeDot : 0;
+    }
+    function goNext(){
+      const i = getActiveIndex();
+      const next = Math.min(i+1, slides.length-1);
+      slides[next].scrollIntoView({behavior:'smooth'});
+    }
+    function goPrev(){
+      const i = getActiveIndex();
+      const prev = Math.max(i-1, 0);
+      slides[prev].scrollIntoView({behavior:'smooth'});
+    }
+
+    window.addEventListener('keydown', (e)=>{
+      // Don't hijack typing inside inputs (none by default, but safe)
+      const tag = (document.activeElement && document.activeElement.tagName || '').toLowerCase();
+      if(['input','textarea','select'].includes(tag)) return;
+
+      // ESC closes modal
+      if(e.key === 'Escape' && modal.classList.contains('open')){ closeVideo(); return; }
+
+      // Space / Arrows navigate slides
+      if(e.key === ' ' || e.code === 'Space' || e.key === 'ArrowRight' || e.key === 'ArrowDown'){
+        e.preventDefault();
+        if(!modal.classList.contains('open')) goNext();
+      } else if(e.key === 'ArrowLeft' || e.key === 'ArrowUp'){
+        e.preventDefault();
+        if(!modal.classList.contains('open')) goPrev();
+      }
+    });
+  </script>
+</body>
+</html>
